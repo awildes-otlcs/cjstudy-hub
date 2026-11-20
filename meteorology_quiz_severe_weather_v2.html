@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Severe Weather Quiz – Lessons 1–3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#EAF0F4; --card:#FFFFFF; --ink:#18263A; --text:#22262E; --muted:#55657A; --line:#C9D4DE;
+  --warm:#C8323C; --cold:#2457A6; --noreast:#5B4A9E; --pick:#E1EAF5;
+  --green:#1E7A4C; --green-soft:#DFF2E6; --red:#B3261E; --red-soft:#FBE3E5;
+  --btn:#18263A; --btn-text:#FFFFFF;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --sky:#0F1722; --card:#18222F; --ink:#C9DAF2; --text:#E6EDF4; --muted:#9AAABB; --line:#2E3C4D;
+    --warm:#F06A72; --cold:#6F9DEB; --noreast:#A895F0; --pick:#22324A;
+    --green:#6FD39A; --green-soft:#16301F; --red:#FF8A80; --red-soft:#3A1B20;
+    --btn:#C9DAF2; --btn-text:#121620; color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--sky);color:var(--text);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:18px;line-height:1.5;min-height:100vh}
+.wrap{max-width:700px;margin:0 auto;padding:26px 18px 60px}
+.front{display:block;width:100%;height:30px;margin-bottom:12px}
+h1{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:2.3rem;line-height:1.05;margin:0 0 6px;color:var(--ink)}
+.sub{color:var(--muted);margin:0 0 22px}
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:22px}
+.modes{display:grid;gap:10px;margin:16px 0}
+.mode{display:block;text-align:left;width:100%;background:transparent;border:1.5px solid var(--line);border-left:6px solid var(--lc,var(--ink));border-radius:8px;padding:12px 14px;font:inherit;color:var(--text);cursor:pointer}
+.mode strong{display:block;color:var(--ink)}
+.mode span{color:var(--muted);font-size:.9rem}
+.mode:hover,.mode:focus-visible{background:var(--pick);outline:none}
+.l1{--lc:var(--cold)} .l2{--lc:var(--warm)} .l3{--lc:var(--noreast)}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;color:var(--muted);font-size:.95rem}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;background:var(--cold);transition:width .25s}
+.section{font-size:.95rem;font-weight:700;margin:0 0 6px;color:var(--lc)}
+.prompt{font-size:1.15rem;font-weight:700;margin:0 0 18px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;font:inherit;color:var(--text);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:11px 14px;cursor:pointer;display:flex;gap:10px}
+.opt b{color:var(--ink)}
+.opt:hover:not(:disabled),.opt:focus-visible{border-color:var(--ink);outline:none;background:var(--pick)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--green-soft);border-color:var(--green)}
+.opt.wrong{background:var(--red-soft);border-color:var(--red);text-decoration:line-through;text-decoration-color:var(--red)}
+.fb{min-height:1.5em;margin:14px 0 0}
+.fb b{display:block}
+.fb.ok b{color:var(--green)} .fb.no b{color:var(--red)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{font:inherit;font-weight:700;background:var(--btn);color:var(--btn-text);border:none;border-radius:8px;padding:11px 18px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn:focus-visible{outline:3px solid var(--cold);outline-offset:2px}
+.score{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:4rem;line-height:1;color:var(--ink);margin:6px 0}
+.miss{border-top:1px dashed var(--muted);padding:12px 0}
+.miss p{margin:2px 0}
+.miss .y{color:var(--red)} .miss .c{color:var(--green);font-weight:700} .miss .x{color:var(--muted);font-size:.92rem}
+.key h3{margin:22px 0 6px;color:var(--lc)}
+.key ol{padding-left:22px;margin:0}
+.key li{margin:0 0 10px}
+.key .c{color:var(--green);font-weight:700}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <svg class="front" viewBox="0 0 700 30" preserveAspectRatio="none" aria-hidden="true">
+    <line x1="0" y1="24" x2="350" y2="24" stroke="#2457A6" stroke-width="4"/>
+    <line x1="350" y1="24" x2="700" y2="24" stroke="#C8323C" stroke-width="4"/>
+    <g fill="#2457A6"><polygon points="30,24 52,24 41,6"/><polygon points="100,24 122,24 111,6"/><polygon points="170,24 192,24 181,6"/><polygon points="240,24 262,24 251,6"/><polygon points="305,24 327,24 316,6"/></g>
+    <g fill="#C8323C"><path d="M380 24 a12 12 0 0 1 24 0z"/><path d="M450 24 a12 12 0 0 1 24 0z"/><path d="M520 24 a12 12 0 0 1 24 0z"/><path d="M590 24 a12 12 0 0 1 24 0z"/><path d="M660 24 a12 12 0 0 1 24 0z"/></g>
+  </svg>
+  <h1>Severe Weather</h1>
+  <p class="sub">Chapter 4 practice quiz, Lessons 1–3</p>
+
+  <div id="start" class="panel">
+    <p style="margin:0">Pick what to practice. Questions and answer choices shuffle every time.</p>
+    <div class="modes">
+      <button class="mode" data-mode="MIX"><strong>Practice test: Lessons 1–3</strong><span>25 random questions from all three lessons</span></button>
+      <button class="mode l1" data-mode="1"><strong>Lesson 1: Air masses</strong><span>cT, mT, cP, mP – <i id="n1"></i> questions</span></button>
+      <button class="mode l2" data-mode="2"><strong>Lesson 2: Fronts &amp; cyclones</strong><span>Warm vs. cold fronts, the cyclone cross-section – <i id="n2"></i> questions</span></button>
+      <button class="mode l3" data-mode="3"><strong>Lesson 3: Nor’easters</strong><span>Ingredients, divergence, blizzard criteria – <i id="n3"></i> questions</span></button>
+      <button class="mode" data-mode="ALL"><strong>Everything</strong><span>All <i id="nAll"></i> questions</span></button>
+    </div>
+    <div class="actions" style="margin-top:4px"><button class="btn ghost" id="keyBtn">Show answer key</button></div>
+  </div>
+
+  <div id="quiz" class="panel hidden">
+    <div class="top"><span id="count"></span><span id="tally"></span></div>
+    <div class="bar"><i id="prog" style="width:0"></i></div>
+    <p class="section" id="sec"></p>
+    <div class="prompt" id="prompt"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb" aria-live="polite"></div>
+    <div class="actions"><button class="btn hidden" id="next">Next question</button><button class="btn ghost" id="quit">Back to menu</button></div>
+  </div>
+
+  <div id="done" class="panel hidden">
+    <p style="margin:0">Your score</p>
+    <div class="score" id="final"></div>
+    <p id="msg" style="margin-top:0"></p>
+    <div class="actions">
+      <button class="btn" id="again">Retake with new questions</button>
+      <button class="btn ghost" id="redo">Practice only the ones I missed</button>
+      <button class="btn ghost" id="home">Back to menu</button>
+    </div>
+    <div id="misses" style="margin-top:20px"></div>
+  </div>
+
+  <div id="key" class="panel key hidden">
+    <h2 style="margin:0">Answer key</h2>
+    <div class="actions"><button class="btn ghost" id="keyHome">Back to menu</button></div>
+    <div id="keyBody"></div>
+  </div>
+</div>
+
+<script>
+const POOL = [
+{
+"l": 1,
+"q": "A weather map is the direct, volatile result of ____ colossal bodies of air crashing into one another.",
+"o": [
+"three",
+"two",
+"four",
+"five"
+],
+"a": 0,
+"tf": false,
+"e": "The notes say three colossal bodies of air collide to produce what you see on the map."
+},
+{
+"l": 1,
+"q": "According to the notes, what is the fundamental ingredient of weather?",
+"o": [
+"The air mass",
+"The jet stream",
+"The ocean current",
+"The sun’s angle"
+],
+"a": 0,
+"tf": false,
+"e": "“The fundamental ingredient is the Air Mass.”"
+},
+{
+"l": 1,
+"q": "An air mass is a large volume of air with uniform:",
+"o": [
+"Temperature, moisture, and wind direction",
+"Temperature, cloud cover, and elevation",
+"Pressure, altitude, and color",
+"Rainfall, sunlight, and wind speed"
+],
+"a": 0,
+"tf": false,
+"e": "Per the notes: uniform temperature, moisture, and wind direction."
+},
+{
+"l": 1,
+"q": "What does “cT” stand for?",
+"o": [
+"Continental Tropical",
+"Cold Tropical",
+"Continental Temperate",
+"Coastal Tropical"
+],
+"a": 0,
+"tf": false,
+"e": "c = continental (dry, formed over land); T = tropical (warm)."
+},
+{
+"l": 1,
+"q": "What are the properties of an mT (Maritime Tropical) air mass?",
+"o": [
+"Moist and warm",
+"Dry and warm",
+"Moist and cold",
+"Dry and cold"
+],
+"a": 0,
+"tf": false,
+"e": "Maritime = moist (over water); Tropical = warm."
+},
+{
+"l": 1,
+"q": "What are the properties of a cP (Continental Polar) air mass?",
+"o": [
+"Dry and cold",
+"Moist and cold",
+"Dry and warm",
+"Moist and warm"
+],
+"a": 0,
+"tf": false,
+"e": "Continental = dry (over land); Polar = cold."
+},
+{
+"l": 1,
+"q": "What are the properties of an mP (Maritime Polar) air mass?",
+"o": [
+"Moist and cold",
+"Dry and cold",
+"Moist and warm",
+"Dry and warm"
+],
+"a": 0,
+"tf": false,
+"e": "Maritime = moist; Polar = cold."
+},
+{
+"l": 1,
+"q": "What are the properties of a cT (Continental Tropical) air mass?",
+"o": [
+"Dry and warm",
+"Moist and warm",
+"Dry and cold",
+"Moist and cold"
+],
+"a": 0,
+"tf": false,
+"e": "Continental = dry; Tropical = warm."
+},
+{
+"l": 1,
+"q": "In air mass names, the lowercase letter (c or m) describes the air mass’s:",
+"o": [
+"Moisture – whether it formed over land or water",
+"Temperature – warm or cold",
+"Speed of movement",
+"Altitude"
+],
+"a": 0,
+"tf": false,
+"e": "On the chart, Moisture runs along the bottom: Continental (dry/land) vs. Maritime (moist/water)."
+},
+{
+"l": 1,
+"q": "In air mass names, the capital letter (T or P) describes the air mass’s:",
+"o": [
+"Temperature – Tropical (warm) or Polar (cold)",
+"Moisture – wet or dry",
+"Pressure – high or low",
+"Direction of travel"
+],
+"a": 0,
+"tf": false,
+"e": "On the chart, Temperature runs up the side: Tropical (warm) at top, Polar (cold) at bottom."
+},
+{
+"l": 1,
+"q": "An air mass forms over a cold ocean far to the north. Which type is it?",
+"o": [
+"mP",
+"cP",
+"mT",
+"cT"
+],
+"a": 0,
+"tf": false,
+"e": "Over water = maritime (m); cold = polar (P)."
+},
+{
+"l": 1,
+"q": "An air mass forms over a hot desert. Which type is it?",
+"o": [
+"cT",
+"mT",
+"cP",
+"mP"
+],
+"a": 0,
+"tf": false,
+"e": "Over land = continental (c); warm = tropical (T)."
+},
+{
+"l": 1,
+"q": "An air mass forms over warm tropical ocean water. Which type is it?",
+"o": [
+"mT",
+"cT",
+"mP",
+"cP"
+],
+"a": 0,
+"tf": false,
+"e": "Over water = maritime (m); warm = tropical (T)."
+},
+{
+"l": 1,
+"q": "An air mass forms over frozen land in northern Canada. Which type is it?",
+"o": [
+"cP",
+"mP",
+"cT",
+"mT"
+],
+"a": 0,
+"tf": false,
+"e": "Over land = continental (c); cold = polar (P)."
+},
+{
+"l": 1,
+"q": "True or False: Continental air masses form over water.",
+"o": [
+"True",
+"False"
+],
+"a": 1,
+"tf": true,
+"e": "False. Continental air masses form over land, so they are dry. Maritime ones form over water."
+},
+{
+"l": 1,
+"q": "The “m” in mT stands for ____.",
+"o": [
+"maritime",
+"moist",
+"mountain",
+"mid-latitude"
+],
+"a": 0,
+"tf": false,
+"e": "Maritime = moist, formed over water."
+},
+{
+"l": 1,
+"q": "The “P” in cP stands for ____.",
+"o": [
+"polar",
+"pressure",
+"plains",
+"Pacific"
+],
+"a": 0,
+"tf": false,
+"e": "Polar = cold."
+},
+{
+"l": 2,
+"q": "A mid-latitude cyclone is a convergence of air masses around a center of:",
+"o": [
+"Low pressure (L)",
+"High pressure (H)",
+"Calm, still air",
+"Warm ocean water"
+],
+"a": 0,
+"tf": false,
+"e": "The diagram shows air masses swirling in toward the L."
+},
+{
+"l": 2,
+"q": "Compared to Maritime Tropical air, Continental Polar air is:",
+"o": [
+"Colder, heavier, and denser",
+"Warmer, lighter, and less dense",
+"The same density",
+"Moister and lighter"
+],
+"a": 0,
+"tf": false,
+"e": "cP properties from the Density Engine table: colder / heavier / denser."
+},
+{
+"l": 2,
+"q": "Compared to Continental Polar air, Maritime Tropical air is:",
+"o": [
+"Warmer, less dense, and lighter",
+"Colder, denser, and heavier",
+"Drier and heavier",
+"Exactly as dense"
+],
+"a": 0,
+"tf": false,
+"e": "mT properties: warmer, less dense, lighter."
+},
+{
+"l": 2,
+"q": "When cold cP air meets warmer air, it acts like a:",
+"o": [
+"Bulldozer, forcing the warmer air to rise vigorously",
+"Blanket, settling gently on top of the warm air",
+"Sponge, soaking up the warm air",
+"Wall that never moves"
+],
+"a": 0,
+"tf": false,
+"e": "The notes describe cP as a bulldozer that forces warmer air to rise vigorously."
+},
+{
+"l": 2,
+"q": "What does warmer, less dense mT air do when it meets colder air at a warm front?",
+"o": [
+"Rises gently over the broader slope of colder air",
+"Sinks underneath the colder air",
+"Pushes the cold air straight up",
+"Stops moving completely"
+],
+"a": 0,
+"tf": false,
+"e": "Warmer, less dense mT air rises gently over the broader slope of the colder air."
+},
+{
+"l": 2,
+"q": "Weather fronts are not just lines on a map; they are turbulent ____ layers.",
+"o": [
+"boundary",
+"pressure",
+"cloud",
+"ozone"
+],
+"a": 0,
+"tf": false,
+"e": "A front is the boundary between two different air masses."
+},
+{
+"l": 2,
+"q": "Fronts are turbulent boundary layers where contrasting ____ fight for space.",
+"o": [
+"densities",
+"colors",
+"altitudes",
+"clouds"
+],
+"a": 0,
+"tf": false,
+"e": "Air masses of different density push against each other at a front."
+},
+{
+"l": 2,
+"q": "“The Density Engine” explains why air moves. Air moves because of differences in:",
+"o": [
+"Density",
+"Color",
+"Altitude only",
+"Daylight"
+],
+"a": 0,
+"tf": false,
+"e": "Dense (cold) air and less-dense (warm) air compete for space, which drives the motion."
+},
+{
+"l": 2,
+"q": "At a warm front, warmer (less dense) air rises ______ up and over the colder air mass.",
+"o": [
+"Gently",
+"Rapidly",
+"Straight up",
+"Not at all"
+],
+"a": 0,
+"tf": false,
+"e": "Warm front = gentle lift over a broad slope."
+},
+{
+"l": 2,
+"q": "At a warm front, warmer (____ dense) air rises gently up and over the colder air mass.",
+"o": [
+"less",
+"more",
+"equally",
+"twice as"
+],
+"a": 0,
+"tf": false,
+"e": "Warm air is less dense than cold air."
+},
+{
+"l": 2,
+"q": "What is the typical weather impact of a warm front?",
+"o": [
+"Widespread, steady, light-to-moderate rain or drizzle",
+"Short, intense thunderstorms",
+"Clear skies and dry air",
+"Hail and tornadoes only"
+],
+"a": 0,
+"tf": false,
+"e": "Warm fronts bring a wide area of steady light-to-moderate rain or drizzle."
+},
+{
+"l": 2,
+"q": "A warm front is frequently accompanied by:",
+"o": [
+"Fog and a gradual temperature increase",
+"Gusty winds and a sharp temperature drop",
+"Hail and a sudden temperature drop",
+"Clear skies and falling dew points"
+],
+"a": 0,
+"tf": false,
+"e": "Fog and gradual warming are warm-front signatures."
+},
+{
+"l": 2,
+"q": "At a cold front, colder, denser air pushes ______ the warmer air.",
+"o": [
+"Underneath",
+"Gently over",
+"Around",
+"Away from"
+],
+"a": 0,
+"tf": false,
+"e": "The cold air wedges underneath the warm air like a bulldozer."
+},
+{
+"l": 2,
+"q": "At a cold front, the warm air is forced to rise ____.",
+"o": [
+"rapidly",
+"gently",
+"slowly",
+"sideways"
+],
+"a": 0,
+"tf": false,
+"e": "Cold front = vigorous lift over a steep slope."
+},
+{
+"l": 2,
+"q": "Which set describes the weather impact of a cold front?",
+"o": [
+"Intense, short-duration precipitation, thunderstorms, heavy rain, a sudden sharp temperature drop, and gusty wind shifts",
+"Steady drizzle, fog, and slow warming",
+"Clear skies and calm winds",
+"Light snow that lasts for days"
+],
+"a": 0,
+"tf": false,
+"e": "Cold fronts are fast and violent: intense, short bursts of precipitation and thunderstorms."
+},
+{
+"l": 2,
+"q": "What happens to the temperature right after a cold front passes?",
+"o": [
+"A sudden, sharp drop",
+"A gradual increase",
+"No change",
+"A sharp rise"
+],
+"a": 0,
+"tf": false,
+"e": "Cold air replaces warm air quickly, so temperatures drop sharply."
+},
+{
+"l": 2,
+"q": "What do the winds do as a cold front passes?",
+"o": [
+"Abrupt, gusty wind shifts",
+"Become perfectly calm",
+"Slowly fade over several days",
+"Always blow from the south"
+],
+"a": 0,
+"tf": false,
+"e": "Notes: abrupt, gusty wind shifts."
+},
+{
+"l": 2,
+"q": "On a weather map, a line with half-circles (semicircles) is a:",
+"o": [
+"Warm front",
+"Cold front",
+"High pressure center",
+"Isobar"
+],
+"a": 0,
+"tf": false,
+"e": "Warm front symbol = semicircles (usually red)."
+},
+{
+"l": 2,
+"q": "On a weather map, a line with triangles is a:",
+"o": [
+"Cold front",
+"Warm front",
+"Low pressure center",
+"Jet stream"
+],
+"a": 0,
+"tf": false,
+"e": "Cold front symbol = triangles (usually blue)."
+},
+{
+"l": 2,
+"q": "According to the comparison table, the leading air mass of a warm front is:",
+"o": [
+"Maritime Tropical (mT) – warmer, less dense",
+"Continental Polar (cP) – colder, denser",
+"Continental Tropical (cT)",
+"Maritime Polar (mP)"
+],
+"a": 0,
+"tf": false,
+"e": "The warm front is led by advancing mT air."
+},
+{
+"l": 2,
+"q": "According to the comparison table, the leading air mass of a cold front is:",
+"o": [
+"Continental Polar (cP) – colder, denser",
+"Maritime Tropical (mT) – warmer, less dense",
+"Continental Tropical (cT)",
+"Maritime Polar (mP)"
+],
+"a": 0,
+"tf": false,
+"e": "The cold front is led by advancing cP air."
+},
+{
+"l": 2,
+"q": "Which describes the air movement at each front?",
+"o": [
+"Warm front: gentle lift. Cold front: forced, vigorous ascent",
+"Warm front: vigorous ascent. Cold front: gentle lift",
+"Both: gentle lift",
+"Both: air sinks"
+],
+"a": 0,
+"tf": false,
+"e": "From the table: warm = gentle lift; cold = forced vigorous ascent."
+},
+{
+"l": 2,
+"q": "Which describes the frontal slope of each front?",
+"o": [
+"Warm front: broad / gentle. Cold front: steep / sharp",
+"Warm front: steep / sharp. Cold front: broad / gentle",
+"Both are steep",
+"Both are flat"
+],
+"a": 0,
+"tf": false,
+"e": "Warm front = broad gentle slope; cold front = steep sharp slope."
+},
+{
+"l": 2,
+"q": "What are the dominant clouds along a warm front?",
+"o": [
+"A stratus sequence (cirrus to nimbostratus)",
+"Cumulus building to cumulonimbus",
+"No clouds at all",
+"Only fog"
+],
+"a": 0,
+"tf": false,
+"e": "Warm fronts produce layered stratus-type clouds, from high cirrus down to rain-making nimbostratus."
+},
+{
+"l": 2,
+"q": "What are the dominant clouds along a cold front?",
+"o": [
+"Cumulus building to cumulonimbus",
+"A stratus sequence (cirrus to nimbostratus)",
+"Only cirrus",
+"Only fog"
+],
+"a": 0,
+"tf": false,
+"e": "Rapid lifting builds tall cumulus and cumulonimbus (thunderstorm) clouds."
+},
+{
+"l": 2,
+"q": "Which describes precipitation at a warm front?",
+"o": [
+"Wide belt, steady, prolonged",
+"Narrow zone, short, intense showers",
+"No precipitation",
+"Hail only"
+],
+"a": 0,
+"tf": false,
+"e": "From the table: wide belt / steady / prolonged."
+},
+{
+"l": 2,
+"q": "Which describes precipitation at a cold front?",
+"o": [
+"Narrow zone, short, intense showers",
+"Wide belt, steady, prolonged",
+"Light drizzle for days",
+"No precipitation"
+],
+"a": 0,
+"tf": false,
+"e": "From the table: narrow zone / short / intense showers."
+},
+{
+"l": 2,
+"q": "What conditions follow after a warm front passes?",
+"o": [
+"Rising temperatures and a higher dew point",
+"A sharp temperature drop and lower dew point",
+"Snow and falling temperatures",
+"No change at all"
+],
+"a": 0,
+"tf": false,
+"e": "Warm, humid mT air moves in: warmer and more moist."
+},
+{
+"l": 2,
+"q": "What conditions follow after a cold front passes?",
+"o": [
+"A sharp temperature drop and a lower dew point",
+"Rising temperatures and a higher dew point",
+"Fog and drizzle for days",
+"Warmer and more humid air"
+],
+"a": 0,
+"tf": false,
+"e": "Cold, dry cP air moves in: colder and drier (lower dew point)."
+},
+{
+"l": 2,
+"q": "True or False: Cold fronts usually produce a wide belt of steady drizzle.",
+"o": [
+"True",
+"False"
+],
+"a": 1,
+"tf": true,
+"e": "False. That describes a warm front. Cold fronts bring short, intense showers and thunderstorms in a narrow zone."
+},
+{
+"l": 2,
+"q": "In the cross-section of a cyclone, where do thunderstorms form?",
+"o": [
+"Along the cold front",
+"Along the warm front",
+"Far ahead of the storm in the cool air",
+"Only in the center of the high"
+],
+"a": 0,
+"tf": false,
+"e": "The diagram shows the T-storm towering at the cold front."
+},
+{
+"l": 2,
+"q": "In the cross-section, the air between the cold front and the warm front is:",
+"o": [
+"Warm and humid (mT)",
+"Cold and dry (cP)",
+"Cool and damp",
+"Hot and dry (cT)"
+],
+"a": 0,
+"tf": false,
+"e": "The middle zone of the diagram is labeled hot/warm, humid mT."
+},
+{
+"l": 2,
+"q": "In the cross-section, the air behind the cold front (at point A) is:",
+"o": [
+"Cold and dry (cP)",
+"Warm and humid (mT)",
+"Cool and damp",
+"Hot and dry (cT)"
+],
+"a": 0,
+"tf": false,
+"e": "Behind the cold front: cold, dry cP air."
+},
+{
+"l": 2,
+"q": "In the cross-section, what is happening ahead of the warm front (toward point B)?",
+"o": [
+"Cool, damp air with a wide belt of steady rain or drizzle",
+"Thunderstorms and gusty winds",
+"Hot, dry, sunny weather",
+"Clear and cold"
+],
+"a": 0,
+"tf": false,
+"e": "Ahead of the warm front, the warm air glides over cool, damp air, producing a wide belt of steady rain or drizzle."
+},
+{
+"l": 2,
+"q": "The storm moves from A toward B. A town at B will experience the weather in which order?",
+"o": [
+"Steady rain/drizzle (warm front) → warm and humid → thunderstorms (cold front) → cold and dry",
+"Thunderstorms → steady rain → cold and dry → warm and humid",
+"Cold and dry → thunderstorms → warm and humid → steady rain",
+"Warm and humid → cold and dry → steady rain → thunderstorms"
+],
+"a": 0,
+"tf": false,
+"e": "The warm front reaches B first, then the warm mT sector, then the cold front with its storms, and finally the cold, dry cP air."
+},
+{
+"l": 3,
+"q": "Diagnostic criteria of a Nor’easter: central pressure less than ____ mb.",
+"o": [
+"990 mb",
+"1,013 mb",
+"300 mb",
+"1,050 mb"
+],
+"a": 0,
+"tf": false,
+"e": "A Nor’easter has central pressure under 990 millibars."
+},
+{
+"l": 3,
+"q": "According to the notes, what season do Nor’easters occur in?",
+"o": [
+"December–March",
+"June–August",
+"April–June",
+"September–November"
+],
+"a": 0,
+"tf": false,
+"e": "The notes list December–March."
+},
+{
+"l": 3,
+"q": "Where is a Nor’easter located?",
+"o": [
+"Off the Northeast coast",
+"Over the Gulf of Mexico",
+"Over the Great Plains",
+"Off the West Coast"
+],
+"a": 0,
+"tf": false,
+"e": "Location: off the Northeast coast."
+},
+{
+"l": 3,
+"q": "What is the trajectory (path) of a Nor’easter?",
+"o": [
+"Moving northeast",
+"Moving southwest",
+"Moving due west",
+"Staying in one place"
+],
+"a": 0,
+"tf": false,
+"e": "Trajectory: moving northeast, up the coast."
+},
+{
+"l": 3,
+"q": "Which of these is NOT one of the 3 ingredients of a Nor’easter?",
+"o": [
+"A tropical hurricane",
+"An upper-level trough",
+"A mid-latitude cyclone in the Southeast",
+"A strong Arctic High"
+],
+"a": 0,
+"tf": false,
+"e": "The 3 ingredients: upper-level trough, mid-latitude cyclone in the Southeast, strong Arctic High."
+},
+{
+"l": 3,
+"q": "Ingredient #1 of a Nor’easter is:",
+"o": [
+"An upper-level trough",
+"A warm ocean eddy",
+"A tropical wave",
+"A sea breeze"
+],
+"a": 0,
+"tf": false,
+"e": "1: an upper-level trough."
+},
+{
+"l": 3,
+"q": "Ingredient #2 of a Nor’easter is:",
+"o": [
+"A mid-latitude cyclone in the Southeast",
+"A stationary front in the Northwest",
+"A heat dome",
+"A desert high"
+],
+"a": 0,
+"tf": false,
+"e": "2: a mid-latitude cyclone in the Southeast."
+},
+{
+"l": 3,
+"q": "Ingredient #3 of a Nor’easter is:",
+"o": [
+"A strong Arctic High",
+"A tropical low",
+"A weak breeze",
+"A warm front"
+],
+"a": 0,
+"tf": false,
+"e": "3: a strong Arctic High."
+},
+{
+"l": 3,
+"q": "“The Vacuum Aloft” refers to a deep upper-air trough at about:",
+"o": [
+"300 mb",
+"990 mb",
+"1,013 mb",
+"35 mb"
+],
+"a": 0,
+"tf": false,
+"e": "The notes mark the deep upper-air trough at 300 mb."
+},
+{
+"l": 3,
+"q": "What aloft forces surface air to rise rapidly?",
+"o": [
+"Divergence",
+"Convergence",
+"Condensation",
+"Evaporation"
+],
+"a": 0,
+"tf": false,
+"e": "Divergence aloft (air spreading out up high) pulls surface air upward rapidly."
+},
+{
+"l": 3,
+"q": "When divergence aloft forces surface air to rise, what does it initiate at the surface?",
+"o": [
+"Low pressure",
+"High pressure",
+"A sea breeze",
+"A temperature inversion"
+],
+"a": 0,
+"tf": false,
+"e": "Rising air leaves less air at the surface, creating low pressure."
+},
+{
+"l": 3,
+"q": "Which describes the strong Arctic High?",
+"o": [
+"Sometimes cold enough for snow, and incredibly dense",
+"Warm, moist, and light",
+"Located over the tropics",
+"Weak and moving quickly"
+],
+"a": 0,
+"tf": false,
+"e": "Per the notes: sometimes cold enough for snow and incredibly dense."
+},
+{
+"l": 3,
+"q": "The developing surface Low is pushed ______ toward the cold air wall.",
+"o": [
+"Northeast",
+"Southwest",
+"Due south",
+"Due west"
+],
+"a": 0,
+"tf": false,
+"e": "The low is pushed northeast toward the wall of cold air."
+},
+{
+"l": 3,
+"q": "The Catalyst: this extreme temperature ____ is what causes the Low to explosively develop.",
+"o": [
+"gradient",
+"inversion",
+"radiation",
+"humidity"
+],
+"a": 0,
+"tf": false,
+"e": "A tight (steep) temperature gradient between cold and warm air fuels explosive development."
+},
+{
+"l": 3,
+"q": "The dense Arctic air mass acts as an immovable:",
+"o": [
+"Wedge",
+"Bulldozer",
+"Sponge",
+"Vacuum"
+],
+"a": 0,
+"tf": false,
+"e": "The Arctic air is an immovable wedge; warm, moist air is forced up over it."
+},
+{
+"l": 3,
+"q": "Along the Arctic air boundary, warm, moist air is forced to rise:",
+"o": [
+"Rapidly",
+"Gently over days",
+"Not at all",
+"Only at night"
+],
+"a": 0,
+"tf": false,
+"e": "Warm, moist air is forced to rise rapidly along the boundary."
+},
+{
+"l": 3,
+"q": "“Scraping the Coastline”: the fully developed storm tracks northeast, funneling intense ______ directly into major coastal cities.",
+"o": [
+"Precipitation and wind",
+"Heat and sunshine",
+"Dry air and dust",
+"Fog and calm"
+],
+"a": 0,
+"tf": false,
+"e": "It funnels intense precipitation and wind into coastal cities."
+},
+{
+"l": 3,
+"q": "Which statement is correct?",
+"o": [
+"A Nor’easter is a storm system; a blizzard is a weather condition",
+"A Nor’easter is a weather condition; a blizzard is a storm system",
+"They are two names for the same thing",
+"Both are types of fronts"
+],
+"a": 0,
+"tf": false,
+"e": "System vs. Condition: Nor’easter = storm system; Blizzard = weather condition."
+},
+{
+"l": 3,
+"q": "For a blizzard, sustained winds must be at least:",
+"o": [
+"35 mph",
+"15 mph",
+"74 mph",
+"100 mph"
+],
+"a": 0,
+"tf": false,
+"e": "Blizzard: sustained winds ≥ 35 mph."
+},
+{
+"l": 3,
+"q": "For a blizzard, visibility must be less than:",
+"o": [
+"1/4 mile",
+"5 miles",
+"1 mile",
+"10 feet"
+],
+"a": 0,
+"tf": false,
+"e": "Blizzard: visibility less than 1/4 mile."
+},
+{
+"l": 3,
+"q": "For a blizzard, the conditions must persist for at least:",
+"o": [
+"3 hours",
+"30 minutes",
+"1 hour",
+"24 hours"
+],
+"a": 0,
+"tf": false,
+"e": "Blizzard: conditions persist at least 3 hours."
+},
+{
+"l": 3,
+"q": "True or False: Every Nor’easter is a blizzard.",
+"o": [
+"True",
+"False"
+],
+"a": 1,
+"tf": true,
+"e": "False. Not every Nor’easter meets the blizzard wind, visibility, and time criteria."
+},
+{
+"l": 3,
+"q": "True or False: Every blizzard is a Nor’easter.",
+"o": [
+"True",
+"False"
+],
+"a": 1,
+"tf": true,
+"e": "False. Blizzards can happen anywhere the conditions are met, like the Great Plains."
+},
+{
+"l": 3,
+"q": "A January storm off the New England coast has a central pressure of 985 mb and is moving northeast. Winds are 20 mph. What is it?",
+"o": [
+"A Nor’easter, but not a blizzard",
+"A blizzard, but not a Nor’easter",
+"Both a Nor’easter and a blizzard",
+"Neither"
+],
+"a": 0,
+"tf": false,
+"e": "It meets the Nor’easter criteria (under 990 mb, Dec–Mar, NE coast, moving NE), but 20 mph winds are below the 35 mph blizzard minimum."
+},
+{
+"l": 3,
+"q": "A snowstorm in Montana has sustained 40 mph winds and visibility of 1/8 mile for 4 hours. What is it?",
+"o": [
+"A blizzard, but not a Nor’easter",
+"A Nor’easter, but not a blizzard",
+"Both",
+"Neither"
+],
+"a": 0,
+"tf": false,
+"e": "It meets all three blizzard criteria, but it isn’t off the Northeast coast, so it’s not a Nor’easter."
+},
+{
+"l": 3,
+"q": "A storm has 40 mph winds and visibility of 1/8 mile, but it only lasts 2 hours. Is it a blizzard?",
+"o": [
+"No – it didn’t last at least 3 hours",
+"Yes – the wind is strong enough",
+"Yes – the visibility is low enough",
+"Only if it is a Nor’easter"
+],
+"a": 0,
+"tf": false,
+"e": "All three criteria must be met, including lasting at least 3 hours."
+},
+{
+"l": 3,
+"q": "A storm off the Northeast coast in February has a central pressure of 1,004 mb. Does it meet the Nor’easter pressure criterion?",
+"o": [
+"No – the pressure must be below 990 mb",
+"Yes – any pressure counts",
+"Yes – it’s above 990 mb",
+"Only if it is snowing"
+],
+"a": 0,
+"tf": false,
+"e": "1,004 mb is higher than 990 mb, so the pressure isn’t low enough."
+}
+];
+const LNAME = {1:"Lesson 1: Air masses",2:"Lesson 2: Fronts & cyclones",3:"Lesson 3: Nor’easters"};
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const $ = id => document.getElementById(id);
+
+function build(mode){
+  let list;
+  if(mode==="MIX") list = shuffle(POOL).slice(0,25);
+  else if(mode==="ALL") list = shuffle(POOL);
+  else list = shuffle(POOL.filter(q=>q.l===+mode));
+  return list.map(q=>({...q, ans:q.o[q.a], opts: q.tf ? [...q.o] : shuffle(q.o)}));
+}
+
+let Q=[], i=0, right=0, missed=[], curMode="MIX";
+function show(id){["start","quiz","done","key"].forEach(x=>$(x).classList.toggle("hidden",x!==id)); window.scrollTo(0,0);}
+function begin(list){ Q=list; i=0; right=0; missed=[]; show("quiz"); render(); }
+
+function render(){
+  const q=Q[i];
+  $("count").textContent=`Question ${i+1} of ${Q.length}`;
+  $("tally").textContent=`${right} correct so far`;
+  $("prog").style.width=(i/Q.length*100)+"%";
+  $("sec").textContent=LNAME[q.l];
+  $("sec").className="section l"+q.l;
+  $("prompt").textContent=q.q;
+  $("fb").innerHTML=""; $("fb").className="fb";
+  $("next").classList.add("hidden");
+  $("opts").innerHTML="";
+  q.opts.forEach((t,k)=>{
+    const b=document.createElement("button");
+    b.className="opt";
+    const lab=document.createElement("b"); lab.textContent="abcd"[k]+".";
+    const sp=document.createElement("span"); sp.textContent=t;
+    b.append(lab,sp);
+    b.onclick=()=>answer(b,t);
+    $("opts").appendChild(b);
+  });
+  $("opts").firstChild.focus({preventScroll:true});
+}
+
+function answer(btn,t){
+  const q=Q[i], ok=t===q.ans;
+  [...$("opts").children].forEach(b=>{ b.disabled=true; if(b.querySelector("span").textContent===q.ans) b.classList.add("right"); });
+  if(ok){ right++; $("fb").className="fb ok"; $("fb").innerHTML="<b>Correct!</b>"; }
+  else { btn.classList.add("wrong"); missed.push({...q,given:t}); $("fb").className="fb no"; $("fb").innerHTML="<b></b>"; $("fb").firstChild.textContent=`Not quite. The answer is “${q.ans}.”`; }
+  const ex=document.createElement("span"); ex.textContent=q.e; $("fb").appendChild(ex);
+  $("tally").textContent=`${right} correct so far`;
+  $("next").textContent = i===Q.length-1 ? "See my score" : "Next question";
+  $("next").classList.remove("hidden"); $("next").focus();
+}
+
+$("next").onclick=()=>{ i++; i<Q.length ? render() : finish(); };
+
+function finish(){
+  $("prog").style.width="100%";
+  const pct=Math.round(right/Q.length*100);
+  $("final").textContent=`${right}/${Q.length}`;
+  $("msg").textContent = pct===100 ? "Perfect score. You’re ready." :
+    pct>=90 ? `${pct}%. Great work – just tidy up the few below.` :
+    pct>=75 ? `${pct}%. Solid. Go over the misses below, then practice the missed ones.` :
+    `${pct}%. Review the misses below and run the quiz again.`;
+  $("redo").classList.toggle("hidden",missed.length===0);
+  const box=$("misses"); box.innerHTML="";
+  if(missed.length){
+    const h=document.createElement("p"); h.innerHTML="<strong>Review these:</strong>"; box.appendChild(h);
+    missed.forEach(m=>{
+      const d=document.createElement("div"); d.className="miss";
+      [["",m.q],["y","You picked: "+m.given],["c","Answer: "+m.ans],["x",m.e]].forEach(([c,t])=>{const p=document.createElement("p"); if(c)p.className=c; p.textContent=t; d.appendChild(p);});
+      box.appendChild(d);
+    });
+  }
+  show("done");
+}
+
+function buildKey(){
+  const kb=$("keyBody"); kb.innerHTML="";
+  [1,2,3].forEach(l=>{
+    const sec=document.createElement("div"); sec.className="l"+l;
+    const h=document.createElement("h3"); h.textContent=LNAME[l]; sec.appendChild(h);
+    const ol=document.createElement("ol");
+    POOL.filter(q=>q.l===l).forEach(q=>{
+      const li=document.createElement("li");
+      const a=document.createElement("div"); a.textContent=q.q;
+      const b=document.createElement("div"); b.className="c"; b.textContent=q.o[q.a];
+      li.append(a,b); ol.appendChild(li);
+    });
+    sec.appendChild(ol); kb.appendChild(sec);
+  });
+}
+
+[1,2,3].forEach(l=>$("n"+l).textContent=POOL.filter(q=>q.l===l).length);
+$("nAll").textContent=POOL.length;
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{ curMode=b.dataset.mode; begin(build(curMode)); });
+$("again").onclick=()=>begin(build(curMode));
+$("redo").onclick=()=>begin(shuffle(missed.map(({given,...q})=>({...q, opts: q.tf ? q.opts : shuffle(q.opts)}))));
+$("home").onclick=()=>show("start");
+$("quit").onclick=()=>show("start");
+$("keyBtn").onclick=()=>{ buildKey(); show("key"); };
+$("keyHome").onclick=()=>show("start");
+</script>
+</body>
+</html>
